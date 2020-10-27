@@ -45,6 +45,7 @@ class Board {
         };
 
         this.enPassantMove = null;
+
     }
 
     setPieceAt( x, y , piece){
@@ -249,6 +250,7 @@ class UI {
 
 function setupChessBoard() {
     chessService = new ChessService();
+    console.log(JSON.stringify(chessService));
     ui = new UI();
     chessBoardContainer = document.getElementById("chessBoardContainer");
     chessBoardContainer.innerHTML = "<canvas id='chessBoard' height='"+ui.fieldSize*9+"' width='"+ui.fieldSize*9+
