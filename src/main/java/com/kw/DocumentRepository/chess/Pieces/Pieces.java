@@ -1,4 +1,4 @@
-package com.kw.DocumentRepository.chess.ai.Pieces;
+package com.kw.DocumentRepository.chess.Pieces;
 
 import java.util.Arrays;
 

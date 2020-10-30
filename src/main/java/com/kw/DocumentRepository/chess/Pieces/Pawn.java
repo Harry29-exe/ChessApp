@@ -1,14 +1,10 @@
-package com.kw.DocumentRepository.chess.ai.Pieces;
+package com.kw.DocumentRepository.chess.Pieces;
 
-import com.kw.DocumentRepository.chess.ai.Board;
-import com.kw.DocumentRepository.chess.ai.Move;
-import com.kw.DocumentRepository.chess.ai.Pieces.Piece;
+import com.kw.DocumentRepository.chess.Board;
+import com.kw.DocumentRepository.chess.Move;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.kw.DocumentRepository.chess.ai.Move.InstructionType.DELETE;
-import static com.kw.DocumentRepository.chess.ai.Move.InstructionType.MOVE;
 
 public class Pawn implements Piece {
     private int x;
@@ -44,45 +40,45 @@ public class Pawn implements Piece {
             if (y == 6) {
                 if (board.getPieceAt(x, y - 1) == null) {
                     if (board.getPieceAt(x, y - 2) == null) {
-                        moves.add( new Move(x, y, new Move.Instruction(MOVE, x, y-2)) );
+                        moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y-2)) );
                     }
-                    moves.add( new Move(x, y, new Move.Instruction(MOVE, x, y-1)) );
+                    moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y-1)) );
                 }
             } else {
                 if (board.getPieceAt(x, y - 1) == null) {
-                    moves.add( new Move(x, y, new Move.Instruction(MOVE, x, y-1)) );
+                    moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y-1)) );
                 }
             }
 
             if( (x - 1 >= 0 && x - 1 < 8) && board.getPieceAt(x - 1, y - 1) != null
                     && isWhite != board.getPieceAt(x - 1, y - 1).isWhite() ){
-                moves.add( new Move(x, y, new Move.Instruction(DELETE, x-1, y-1), new Move.Instruction(MOVE, x-1, y-1)) );
+                moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.DELETE, x-1, y-1), new Move.Instruction(Move.InstructionType.MOVE, x-1, y-1)) );
             }
             if ((x + 1 >= 0 && x + 1 < 8) && board.getPieceAt(x + 1, y - 1) != null
                     && isWhite != board.getPieceAt(x + 1, y - 1).isWhite() ) {
-                moves.add( new Move(x, y, new Move.Instruction(DELETE, x+1, y-1), new Move.Instruction(MOVE, x+1, y-1)) );
+                moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.DELETE, x+1, y-1), new Move.Instruction(Move.InstructionType.MOVE, x+1, y-1)) );
             }
         } else {
             if( y == 1 ){
                 if( board.getPieceAt(x, y+1) == null ){
                     if( board.getPieceAt(x, y+2) == null ){
-                        moves.add( new Move(x, y, new Move.Instruction(MOVE, x, y+2)) );
+                        moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y+2)) );
                     }
-                    moves.add( new Move(x, y, new Move.Instruction(MOVE, x, y+1)) );
+                    moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y+1)) );
                 }
             } else {
                 if( board.getPieceAt(x, y+1) == null ) {
-                    moves.add( new Move(x, y, new Move.Instruction(MOVE, x, y+1)) );
+                    moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y+1)) );
                 }
             }
 
             if( (x+1 >= 0 && x+1<8) && board.getPieceAt(x+1, y+1) != null
                     && isWhite != board.getPieceAt(x+1, y+1).isWhite() ){
-                moves.add( new Move(x, y, new Move.Instruction(DELETE, x+1, y+1), new Move.Instruction(MOVE, x+1, y+1)) );
+                moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.DELETE, x+1, y+1), new Move.Instruction(Move.InstructionType.MOVE, x+1, y+1)) );
             }
             if( (x-1 >= 0 && x+1<8) && board.getPieceAt(x-1, y+1) != null
                     && isWhite != board.getPieceAt(x-1, y+1).isWhite() ){
-                moves.add( new Move(x, y, new Move.Instruction(DELETE, x-1, y+1), new Move.Instruction(MOVE, x-1, y+1)) );
+                moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.DELETE, x-1, y+1), new Move.Instruction(Move.InstructionType.MOVE, x-1, y+1)) );
             }
         }
         return moves;

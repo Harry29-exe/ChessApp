@@ -1,6 +1,7 @@
-package com.kw.DocumentRepository.chess.ai;
+package com.kw.DocumentRepository.chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Move {
@@ -8,25 +9,14 @@ public class Move {
     public final int pieceY;
     private final List<Instruction> instructions = new ArrayList<>();
 
-    public Move(int pieceX, int pieceY) {
-        this.pieceX = pieceX;
-        this.pieceY = pieceY;
-    }
-
     public Move(int pieceX, int pieceY, Instruction... instructions) {
         this.pieceX = pieceX;
         this.pieceY = pieceY;
-        for( Instruction instruction : instructions ){
-            this.instructions.add(instruction);
-        }
+        this.instructions.addAll(Arrays.asList(instructions));
     }
 
     public List<Instruction> getInstructions(){
         return instructions;
-    }
-
-    public void addInstruction( InstructionType type, int xToExecuteOn, int yToExecuteOn ){
-        instructions.add(new Instruction(type, xToExecuteOn, yToExecuteOn));
     }
 
     public static class Instruction {
@@ -44,6 +34,8 @@ public class Move {
     public enum InstructionType {
         DELETE,
         MOVE,
-        TRANSFORM
+        TRANSFORM,
+        LOCK_CASTLING,
+        SET_EL_PASSANT
     }
 }

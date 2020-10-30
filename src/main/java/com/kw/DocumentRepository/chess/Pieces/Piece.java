@@ -1,8 +1,8 @@
-package com.kw.DocumentRepository.chess.ai.Pieces;
+package com.kw.DocumentRepository.chess.Pieces;
 
 
-import com.kw.DocumentRepository.chess.ai.Board;
-import com.kw.DocumentRepository.chess.ai.Move;
+import com.kw.DocumentRepository.chess.Board;
+import com.kw.DocumentRepository.chess.Move;
 
 import java.util.List;
 
