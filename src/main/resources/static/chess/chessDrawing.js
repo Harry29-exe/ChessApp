@@ -1,4 +1,4 @@
-import {Board, chessPieces} from "/chess/chessBoard.js";
+import {chessPieces} from "/chess/chessBoard.js";
 
 export const white = "rgb(227,227,227)", black = "rgb(28,28,28)";
 
@@ -70,29 +70,59 @@ export class UI {
     drawPiece(xIndex, yIndex, board) {
         let xStart = this.fieldSize * (0.5 + xIndex);
         let yStart = this.fieldSize * (0.5 + yIndex) + this.fieldSize * 0.15;
-        if (board.getPieceAt(xIndex, yIndex) != null) {
+        
+        if (board.getPieceAt(xIndex, yIndex) !== chessPieces.NULL) {
             this.chessBoardCTX.font = this.fieldSize + "px Pecita";//"px FreeSerif";
             this.chessBoardCTX.textBaseline = "top";
 
             let fieldColor = (xIndex + yIndex) % 2 === 0 ? white : black;
             let piece = board.getPieceAt(xIndex, yIndex).valueOf();
-            if (piece > chessPieces.LAST_WHITE_PIECE_INDEX) {
+            if (piece < 0) {
                 if (fieldColor === black) {
                     this.chessBoardCTX.fillStyle = black;
-                    this.chessBoardCTX.fillText(String.fromCharCode(piece), xStart, yStart);
+                    this.chessBoardCTX.fillText(this.pieceCodeToPieceChar(piece), xStart, yStart);
                     this.chessBoardCTX.fillStyle = "rgb(200,200,200)";
-                    this.chessBoardCTX.fillText(String.fromCharCode(piece - 6), xStart, yStart);
+                    this.chessBoardCTX.fillText(this.pieceCodeToPieceChar(-piece), xStart, yStart);
 
                 } else {
                     this.chessBoardCTX.fillStyle = black;
-                    this.chessBoardCTX.fillText(String.fromCharCode(piece), xStart, yStart);
+                    this.chessBoardCTX.fillText(this.pieceCodeToPieceChar(piece), xStart, yStart);
                 }
             } else {
                 this.chessBoardCTX.fillStyle = white;
-                this.chessBoardCTX.fillText(String.fromCharCode(piece + 6), xStart, yStart);
+                this.chessBoardCTX.fillText(this.pieceCodeToPieceChar(-piece), xStart, yStart);
                 this.chessBoardCTX.fillStyle = black;
-                this.chessBoardCTX.fillText(String.fromCharCode(piece), xStart, yStart);
+                this.chessBoardCTX.fillText(this.pieceCodeToPieceChar(piece), xStart, yStart);
             }
+        }
+    }
+
+    pieceCodeToPieceChar(pieceCode) {
+        switch (pieceCode) {
+            case -6:
+                return String.fromCharCode(9818);
+            case -5:
+                return String.fromCharCode(9819);
+            case -4:
+                return String.fromCharCode(9821);
+            case -3:
+                return String.fromCharCode(9822);
+            case -2:
+                return String.fromCharCode(9820);
+            case -1:
+                return String.fromCharCode(9823);
+            case 1:
+                return String.fromCharCode(9817);
+            case 2:
+                return String.fromCharCode(9814);
+            case 3:
+                return String.fromCharCode(9816);
+            case 4:
+                return String.fromCharCode(9815);
+            case 5:
+                return String.fromCharCode(9813);
+            case 6:
+                return String.fromCharCode(9812);
         }
     }
 }

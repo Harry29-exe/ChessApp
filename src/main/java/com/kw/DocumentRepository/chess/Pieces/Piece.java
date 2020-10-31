@@ -1,17 +1,45 @@
 package com.kw.DocumentRepository.chess.Pieces;
 
+import java.util.HashMap;
+import java.util.Map;
 
-import com.kw.DocumentRepository.chess.Board;
-import com.kw.DocumentRepository.chess.Move;
+public enum Piece {
+    BLACK_PAWN(-1),
+    BLACK_ROOK(-2),
+    BLACK_KNIGHT(-3),
+    BLACK_BISHOP(-4),
+    BLACK_QUEEN(-5),
+    BLACK_KING(-6),
+    NULL(0),
+    WHITE_PAWN(1),
+    WHITE_ROOK(2),
+    WHITE_KNIGHT(3),
+    WHITE_BISHOP(4),
+    WHITE_QUEEN(5),
+    WHITE_KING(6);
 
-import java.util.List;
+    private static final Map<Integer, Piece> BY_CODE = new HashMap<>();
 
-public interface Piece {
-    int[] getPosition();
+    static {
+        for(Piece piece : values()) {
+            BY_CODE.put(piece.code, piece);
+        }
+    }
 
-    void setPosition( int x, int y );
+    public static Piece getPieceTypeByCode(int code) {
+        return BY_CODE.get(code);
+    }
 
-    boolean isWhite();
+    public static boolean isPieceWhite(Piece piece) {
+        return piece.code > 0;
+    }
 
-    List<Move> getPossibleMoves(Board board);
+    public static boolean isPieceWhite(int code) {
+        return code > 0;
+    }
+
+    public final int code;
+    Piece(int i) {
+        code = i;
+    }
 }

@@ -1,86 +1,116 @@
 package com.kw.DocumentRepository.chess.Pieces;
 
-import com.kw.DocumentRepository.chess.Board;
-import com.kw.DocumentRepository.chess.Move;
+import com.kw.DocumentRepository.chess.JSONBoard;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class Pawn implements Piece {
+import static com.kw.DocumentRepository.chess.Pieces.Piece.*;
+
+public class Pawn implements PieceController {
+    private JSONBoard board;
+    private Piece piece;
+    private List<JSONBoard> boards;
     private int x;
     private int y;
     private boolean isWhite;
 
-    public Pawn(int x, int y, boolean isWhite) {
+    @Override
+    public List<JSONBoard> getPossibleBoardStates(int x, int y, JSONBoard board) {
+        this.board = board;
+        this.piece = Piece.getPieceTypeByCode(board.getPieceAt(x, y));
+        this.boards = new LinkedList<>();
         this.x = x;
         this.y = y;
-        this.isWhite = isWhite;
+        this.isWhite = Piece.isPieceWhite(piece);
+
+        checkMoveForward();
+        checkBeatings();
+
+        this.board = null;
+        this.piece = null;
+
+        List<JSONBoard> temp = boards;
+        boards = null;
+        return temp;
     }
 
-    @Override
-    public int[] getPosition() {
-        return new int[]{x, y};
+    private void checkMoveForward() {
+        int yVar = isWhite ? -1 : 1;
+        int yStart = isWhite ? 6 : 1;
+        int yEnd = isWhite ? 1 : 6;
+
+        if(y == yStart && board.getPieceAt(x,y + yVar) == NULL.code && board.getPieceAt(x,y + 2*yVar) == NULL.code) {
+            JSONBoard b1 = board.clone();
+            b1.setPieceAt(x,y, NULL.code);
+            b1.setPieceAt(x,y+yVar, piece.code);
+            boards.add(b1);
+            JSONBoard b2 = board.clone();
+            b2.setPieceAt(x,y, NULL.code);
+            b2.setPieceAt(x,y+2*yVar, piece.code);
+            boards.add(b2);
+        } else if(y == yEnd && board.getPieceAt(x,y + yVar) == NULL.code) {
+            promoteMove(x, y+yVar);
+        } else if(board.getPieceAt(x,y + yVar) == NULL.code) {
+            JSONBoard b = board.clone();
+            b.setPieceAt(x,y, NULL.code);
+            b.setPieceAt(x,y+yVar, piece.code);
+            boards.add(b);
+        }
     }
 
-    @Override
-    public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+    private void checkBeatings() {
+        int yVar = isWhite ? -1 : 1;
+        int yStart = isWhite ? 6 : 1;
+        int yEnd = isWhite ? 1 : 6;
 
-    @Override
-    public boolean isWhite() {
-        return isWhite;
-    }
-
-    @Override
-    public List<Move> getPossibleMoves(Board board) {
-        List<Move> moves = new LinkedList<>();
-        if( isWhite ){
-            if (y == 6) {
-                if (board.getPieceAt(x, y - 1) == null) {
-                    if (board.getPieceAt(x, y - 2) == null) {
-                        moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y-2)) );
-                    }
-                    moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y-1)) );
+        Piece pieceToBeat;
+        if((x+1 >= 0 && x+1 < 8)) {
+            pieceToBeat = getPieceTypeByCode(board.getPieceAt(x+1,y+yVar));
+            if(pieceToBeat != NULL && !isPieceWhite(piece) == isPieceWhite(pieceToBeat)) {
+                if (y == yEnd) {
+                    promoteMove(x + 1, y + yVar);
+                } else {
+                    JSONBoard b = board.clone();
+                    b.setPieceAt(x, y, NULL.code);
+                    b.setPieceAt(x + 1, y + yVar, isWhite ? WHITE_PAWN.code : BLACK_PAWN.code);
+                    boards.add(b);
                 }
-            } else {
-                if (board.getPieceAt(x, y - 1) == null) {
-                    moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y-1)) );
-                }
-            }
-
-            if( (x - 1 >= 0 && x - 1 < 8) && board.getPieceAt(x - 1, y - 1) != null
-                    && isWhite != board.getPieceAt(x - 1, y - 1).isWhite() ){
-                moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.DELETE, x-1, y-1), new Move.Instruction(Move.InstructionType.MOVE, x-1, y-1)) );
-            }
-            if ((x + 1 >= 0 && x + 1 < 8) && board.getPieceAt(x + 1, y - 1) != null
-                    && isWhite != board.getPieceAt(x + 1, y - 1).isWhite() ) {
-                moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.DELETE, x+1, y-1), new Move.Instruction(Move.InstructionType.MOVE, x+1, y-1)) );
-            }
-        } else {
-            if( y == 1 ){
-                if( board.getPieceAt(x, y+1) == null ){
-                    if( board.getPieceAt(x, y+2) == null ){
-                        moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y+2)) );
-                    }
-                    moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y+1)) );
-                }
-            } else {
-                if( board.getPieceAt(x, y+1) == null ) {
-                    moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.MOVE, x, y+1)) );
-                }
-            }
-
-            if( (x+1 >= 0 && x+1<8) && board.getPieceAt(x+1, y+1) != null
-                    && isWhite != board.getPieceAt(x+1, y+1).isWhite() ){
-                moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.DELETE, x+1, y+1), new Move.Instruction(Move.InstructionType.MOVE, x+1, y+1)) );
-            }
-            if( (x-1 >= 0 && x+1<8) && board.getPieceAt(x-1, y+1) != null
-                    && isWhite != board.getPieceAt(x-1, y+1).isWhite() ){
-                moves.add( new Move(x, y, new Move.Instruction(Move.InstructionType.DELETE, x-1, y+1), new Move.Instruction(Move.InstructionType.MOVE, x-1, y+1)) );
             }
         }
-        return moves;
+
+
+        if((x-1 >= 0 && x-1 < 8)) {
+            pieceToBeat = getPieceTypeByCode(board.getPieceAt(x - 1, y + yVar));
+            if( pieceToBeat != NULL && !isPieceWhite(piece) == isPieceWhite(pieceToBeat)) {
+                if (y == yEnd) {
+                    promoteMove(x - 1, y + yVar);
+                } else {
+                    JSONBoard b = board.clone();
+                    b.setPieceAt(x, y, NULL.code);
+                    b.setPieceAt(x - 1, y + yVar, isWhite ? WHITE_PAWN.code : BLACK_PAWN.code);
+                    boards.add(b);
+                }
+            }
+        }
     }
+
+    private void promoteMove(int onX, int onY) {
+        if(isWhite) {
+            for(int p = WHITE_ROOK.code; p < WHITE_KING.code; p++) {
+                JSONBoard b = board.clone();
+                b.setPieceAt(x,y, NULL.code);
+                b.setPieceAt(onX, onY, p);
+                boards.add(b);
+            }
+        } else {
+            for(int p = BLACK_ROOK.code; p > BLACK_KING.code; p--) {
+                JSONBoard b = board.clone();
+                b.setPieceAt(x,y, NULL.code);
+                b.setPieceAt(onX, onY, p);
+                boards.add(b);
+            }
+        }
+    }
+
 }

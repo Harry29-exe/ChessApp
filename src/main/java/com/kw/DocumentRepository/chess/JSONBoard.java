@@ -1,14 +1,31 @@
 package com.kw.DocumentRepository.chess;
 
-public class JSONBoard {
-    private int[][] pieces;
-    private Boolean whitePlayersTurn;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+
+public class JSONBoard implements Cloneable{
+    private Integer[][] pieces;
+    private Boolean isItWhitesTurn;
     private Castling castling;
     private ElPassantBeatingAvailableAt elPassantBeatingAvailableAt;
 
-    public JSONBoard(int[][] pieces, Boolean whitePlayersTurn, Castling castling, ElPassantBeatingAvailableAt elPassantBeatingAvailableAt) {
+    public static void main(String[] args) {
+        JSONBoard board = new JSONBoard(new Integer[][]{
+                {-2,-3,-4,-6,-5,-4,-3,-2}, {-1,-1,-1,-1,-1,-1,-1,-1},
+                {0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},
+                {0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0},
+                {1,1,1,1,1,0,1,1},{2,3,4,6,5,4,3,2}
+        }, true, new Castling(true,true,true,true), new ElPassantBeatingAvailableAt(0,0));
+
+        JSONBoard copy = board.clone();
+        copy.setPieceAt(0,0,84);
+        copy.setItWhitePlayersTurn(false);
+        System.out.println(board.getPieceAt(0,0));
+        System.out.println(board.getIsItWhitesTurn());
+    }
+
+    public JSONBoard(Integer[][] pieces, Boolean whitePlayersTurn, Castling castling, ElPassantBeatingAvailableAt elPassantBeatingAvailableAt) {
         this.pieces = pieces;
-        this.whitePlayersTurn = whitePlayersTurn;
+        this.isItWhitesTurn = whitePlayersTurn;
         this.castling = castling;
         this.elPassantBeatingAvailableAt = elPassantBeatingAvailableAt;
     }
@@ -16,20 +33,39 @@ public class JSONBoard {
     public JSONBoard() {
     }
 
-    public int[][] getPieces() {
+    @Override
+    public JSONBoard clone() {
+        Integer[][] piecesCopy = new Integer[8][8];
+        for(int y = 0; y < 8; y++) {
+            for(int x = 0; x < 8; x++) {
+                piecesCopy[y][x] = pieces[y][x];
+            }
+        }
+        return new JSONBoard(piecesCopy, this.isItWhitesTurn.booleanValue(), this.castling.clone(), this.elPassantBeatingAvailableAt.clone());
+    }
+
+    public Integer[][] getPieces() {
         return pieces;
     }
 
-    public void setPieces(int[][] pieces) {
+    public Integer getPieceAt(int x, int y) {
+        return pieces[y][x];
+    }
+
+    public void setPieceAt(int x, int y, int pieceCode) {
+        pieces[y][x] = pieceCode;
+    }
+
+    public void setPieces(Integer[][] pieces) {
         this.pieces = pieces;
     }
 
-    public boolean isWhitePlayersTurn() {
-        return whitePlayersTurn;
+    public boolean getIsItWhitesTurn() {
+        return isItWhitesTurn;
     }
 
     public void setItWhitePlayersTurn(boolean itWhitePlayersTurn) {
-        whitePlayersTurn = itWhitePlayersTurn;
+        isItWhitesTurn = itWhitePlayersTurn;
     }
 
     public Castling getCastling() {
@@ -48,11 +84,26 @@ public class JSONBoard {
         this.elPassantBeatingAvailableAt = elPassantBeatingAvailableAt;
     }
 
-    public static class Castling {
+    public static class Castling implements Cloneable {
         private boolean whiteLong;
         private boolean whiteShort;
         private boolean blackLong;
         private boolean blackShort;
+
+        public Castling(boolean whiteLong, boolean whiteShort, boolean blackLong, boolean blackShort) {
+            this.whiteLong = whiteLong;
+            this.whiteShort = whiteShort;
+            this.blackLong = blackLong;
+            this.blackShort = blackShort;
+        }
+
+        public Castling() {
+        }
+
+        @Override
+        public Castling clone() {
+            return new Castling(this.whiteLong, this.whiteShort, this.blackLong, this.blackShort);
+        }
 
         public boolean isWhiteLong() {
             return whiteLong;
@@ -87,9 +138,22 @@ public class JSONBoard {
         }
     }
 
-    public static class ElPassantBeatingAvailableAt {
+    public static class ElPassantBeatingAvailableAt implements Cloneable {
         private int x;
         private int y;
+
+        public ElPassantBeatingAvailableAt(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public ElPassantBeatingAvailableAt() {
+        }
+
+        @Override
+        public ElPassantBeatingAvailableAt clone() {
+            return new ElPassantBeatingAvailableAt(this.x, this.y);
+        }
 
         public int getX() {
             return x;

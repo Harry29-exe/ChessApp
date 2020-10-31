@@ -12,6 +12,12 @@ function setupChessBoard() {
     chessService = new ChessService();
 
     ui.drawChessBoard(chessService.board);
+
+    function logTurn() {
+        console.log(chessService.board.isItWhitesTurn);
+        setTimeout(function () {logTurn();}, 1_000);
+    }
+    //logTurn();
 }
 
 function chessBoardOnClick(event) {
@@ -21,21 +27,15 @@ function chessBoardOnClick(event) {
         return;
     }
 
-    let filesToColor = chessService.determinePlayerIntention(x, y);
+    let filesToColor = chessService.handlePayerAction(x, y);
     ui.drawChessBoard(chessService.board);
     if (filesToColor !== null) {
         for (let i = 0; i < filesToColor.length; i++) {
             ui.fillField(filesToColor[i][0], filesToColor[i][1], filesToColor[i][2]);
         }
     }
+}
 
-    chessService.board.isItWhitesTurn = !chessService.board.isItWhitesTurn;
-
-    let moveRequest = new XMLHttpRequest();
-    let jsonBoard = JSON.stringify(chessService.board);
-    console.log(jsonBoard);
-    moveRequest.open("GET", "http://localhost:8080/api/chess/get-move");
-    //moveRequest.setRequestHeader("Content-Length", ""+jsonBoard.length);
-    moveRequest.overrideMimeType('application/json');
-    moveRequest.send(jsonBoard);
+export function redraw() {
+    ui.drawChessBoard(chessService.board);
 }

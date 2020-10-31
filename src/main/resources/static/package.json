@@ -1,5 +1,5 @@
 {
-    "whitePlayersTurn": true,
+    "isItWhitesTurn": true,
     "pieces": [
       [0,0,0,0,0,0,0,0],
       [0,0,0,0,0,0,0,0],
@@ -16,8 +16,8 @@
       "blackLong": true, "blackShort": true
     },
 
-    "elPessantBeatingAvailableAt": {
-      "x": null,
-      "y": null
+    "elPassantBeatingAvailableAt": {
+      "x": 1,
+      "y": 1
     }
 }

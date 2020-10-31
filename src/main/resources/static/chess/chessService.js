@@ -1,17 +1,19 @@
 import {Board, chessPieces} from "/chess/chessBoard.js";
+import {redraw} from "/chess/chessScript.js";
 
 export class ChessService {
     constructor() {
         this.board = new Board();
         this.selectedX = null;
         this.selectedY = null;
+        this.locked = false;
     }
 
-    determinePlayerIntention(clickedX, clickedY) {
+    handlePayerAction(clickedX, clickedY) {
         let clickedPiece = this.board.getPieceAt(clickedX, clickedY);
         let moves;
 
-        if (this.selectedX == null && clickedPiece !== null) {
+        if (this.selectedX == null && clickedPiece !== chessPieces.NULL) {
             this.selectedX = clickedX;
             this.selectedY = clickedY;
             return this.getColoredFields(clickedX, clickedY);
@@ -74,9 +76,33 @@ export class ChessService {
 
     makeMove(fromX, fromY, toX, toY) {
         let piece = this.board.getPieceAt(fromX, fromY);
-        this.board.setPieceAt(fromX, fromY, null);
+        this.board.setPieceAt(fromX, fromY, chessPieces.NULL);
         this.board.setPieceAt(toX, toY, piece);
         this.board.isItWhitesTurn = !this.board.isItWhitesTurn;
+        this.makeRequest();
+    }
+
+    makeRequest() {
+        let moveRequest = new XMLHttpRequest();
+        let jsonBoard = JSON.stringify(this.board);
+        let _board = this.board;
+
+        moveRequest.onreadystatechange = function () {
+            if(moveRequest.readyState === 4 && moveRequest.status === 200) {
+                let json = JSON.parse(moveRequest.responseText);
+                console.log(json.isItWhitesTurn);
+                _board.pieces = json.pieces;
+                _board.isItWhitesTurn = json.isItWhitesTurn;
+                _board.elPassantBeatingAvailableAt = json.elPassantBeatingAvailableAt;
+                _board.castling = json.castling;
+                redraw();
+            }
+        }
+
+        moveRequest.open("POST", "http://localhost:8080/api/chess/make-move", true);
+        moveRequest.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+        moveRequest.send(jsonBoard);
+
     }
 }
 
@@ -122,7 +148,7 @@ function getAvailableMoves(xLocation,yLocation, board) {
     }
 
     function check(xChange, yChange) {
-        if( board.getPieceAt(x, y) === null ){
+        if( board.getPieceAt(x, y) === chessPieces.NULL ){
             moves.push([x,y]);
             x += xChange;
             y += yChange;
@@ -155,7 +181,7 @@ function getAvailableMoves(xLocation,yLocation, board) {
             x = xLocation + xChange;
             y = yLocation + yChange;
             if( (x < 8 && x >= 0) && (y < 8 && y >= 0) ) {
-                if( board.getPieceAt(x, y) === null ){
+                if( board.getPieceAt(x, y) === chessPieces.NULL ){
                     moves.push([x, y]);
                 } else if( board.isPieceWhite(x, y) !== isWhite ){
                     moves.push([x, y]);
@@ -182,7 +208,7 @@ function getAvailableMoves(xLocation,yLocation, board) {
         for( let xChange = -1; xChange < 2; xChange++ ){
             for( let yChange = -1; yChange < 2; yChange++){
                 if( (xChange !== 0 || yChange !== 0) && (x+xChange < 8 && x+xChange >= 0) && (y+yChange < 8 && y+yChange >= 0)) {
-                    if( board.getPieceAt(x+xChange, y+yChange) === null ){
+                    if( board.getPieceAt(x+xChange, y+yChange) === chessPieces.NULL ){
                         moves.push([x+xChange, y+yChange]);
                     } else if( board.isPieceWhite(x+xChange, y+yChange) !== isWhite ){
                         moves.push([x+xChange, y+yChange]);
@@ -191,15 +217,15 @@ function getAvailableMoves(xLocation,yLocation, board) {
             }
         }
 
-        if( isWhite ){
-            if( board.isCastlingAvailable.WHITE_LONG ){
-                if( board.getPieceAt(4,7) === null &&
-                    board.getPieceAt(5,7) === null &&
-                    board.getPieceAt(6,7) === null ){
-                    //moves.push
-                }
-            }
-        }
+        // if( isWhite ){
+        //     if( board.isCastlingAvailable.WHITE_LONG ){
+        //         if( board.getPieceAt(4,7) === null &&
+        //             board.getPieceAt(5,7) === null &&
+        //             board.getPieceAt(6,7) === null ){
+        //             //moves.push
+        //         }
+        //     }
+        // }
     }
 
     function checkPawnMoves() {
@@ -210,48 +236,52 @@ function getAvailableMoves(xLocation,yLocation, board) {
         }
 
         function whitePawnCheck(){
+            if(yLocation === 0)
+                return;
             if(yLocation === 6){
-                if( board.getPieceAt(xLocation, yLocation-1) === null ){
-                    if( board.getPieceAt(xLocation, yLocation-2) === null ){
+                if( board.getPieceAt(xLocation, yLocation-1) === chessPieces.NULL ){
+                    if( board.getPieceAt(xLocation, yLocation-2) === chessPieces.NULL ){
                         moves.push([xLocation, yLocation-2]);
                     }
                     moves.push([xLocation, yLocation-1]);
                 }
             } else {
-                if( board.getPieceAt(xLocation, yLocation-1) === null ) {
+                if( board.getPieceAt(xLocation, yLocation-1) === chessPieces.NULL ) {
                     moves.push([xLocation, yLocation-1]);
                 }
             }
 
-            if( (xLocation-1 >= 0 && xLocation-1<8) && board.getPieceAt(xLocation-1, yLocation-1) !== null
+            if( (xLocation-1 >= 0 && xLocation-1<8) && board.getPieceAt(xLocation-1, yLocation-1) !== chessPieces.NULL
                 && isWhite !== board.isPieceWhite(xLocation-1, yLocation-1) ){
                 moves.push([xLocation-1, yLocation-1]);
             }
-            if( (xLocation+1 >= 0 && xLocation+1<8) && board.getPieceAt(xLocation+1, yLocation-1) !== null
+            if( (xLocation+1 >= 0 && xLocation+1<8) && board.getPieceAt(xLocation+1, yLocation-1) !== chessPieces.NULL
                 && isWhite !== board.isPieceWhite(xLocation+1, yLocation-1) ){
                 moves.push([xLocation+1, yLocation-1]);
             }
         }
 
         function blackPawnCheck(){
+            if(yLocation === 7)
+                return;
             if( yLocation === 1 ){
-                if( board.getPieceAt(xLocation, yLocation+1) === null ){
-                    if( board.getPieceAt(xLocation, yLocation+2) === null ){
+                if( board.getPieceAt(xLocation, yLocation+1) === chessPieces.NULL ){
+                    if( board.getPieceAt(xLocation, yLocation+2) === chessPieces.NULL ){
                         moves.push([xLocation, yLocation+2]);
                     }
                     moves.push([xLocation, yLocation+1]);
                 }
             } else {
-                if( board.getPieceAt(xLocation, yLocation+1) === null ) {
+                if( board.getPieceAt(xLocation, yLocation+1) === chessPieces.NULL ) {
                     moves.push([xLocation, yLocation+1]);
                 }
             }
 
-            if( (xLocation+1 >= 0 && xLocation+1<8) && board.getPieceAt(xLocation+1, yLocation+1) !== null
+            if( (xLocation+1 >= 0 && xLocation+1<8) && board.getPieceAt(xLocation+1, yLocation+1) !== chessPieces.NULL
                 && isWhite !== board.isPieceWhite(xLocation+1, yLocation+1) ){
                 moves.push([xLocation+1, yLocation+1]);
             }
-            if( (xLocation-1 >= 0 && xLocation-1<8) && board.getPieceAt(xLocation-1, yLocation+1) !== null
+            if( (xLocation-1 >= 0 && xLocation-1<8) && board.getPieceAt(xLocation-1, yLocation+1) !== chessPieces.NULL
                 && isWhite !== board.isPieceWhite(xLocation-1, yLocation+1) ){
                 moves.push([xLocation-1, yLocation+1]);
             }
