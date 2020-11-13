@@ -1,12 +1,12 @@
 package com.kw.DocumentRepository.chess.ai;
 
-import com.kw.DocumentRepository.chess.JSONBoard;
+import com.kw.DocumentRepository.chess.Board;
 import com.kw.DocumentRepository.chess.Pieces.Piece;
 
 public class BaseBoardEvaluator implements BoardEvaluator {
 
     @Override
-    public double evaluateBoard(JSONBoard board) {
+    public double evaluateBoard(Board board) {
         double evaluation = 0;
         boolean whiteKingStillOnBoard = false;
         boolean blackKingStillOnBoard = false;

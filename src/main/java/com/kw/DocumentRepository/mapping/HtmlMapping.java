@@ -76,6 +76,11 @@ public class HtmlMapping {
         return "" + testBean.getI();
     }
 
+    @GetMapping("/test-ping")
+    public String getTestPing() {
+        return "";
+    }
+
     @PostMapping("/uploadFile")
     public String uploadFile(@RequestParam("file") MultipartFile file) {
         System.out.println(file.getName());

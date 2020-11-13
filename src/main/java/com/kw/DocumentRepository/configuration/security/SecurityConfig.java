@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     @Autowired
     UserService userDetailsService;
 
@@ -27,10 +26,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/uploadFile").authenticated()
+
+                .antMatchers("/api/chess/get-move")
+                .authenticated()
+
+                .antMatchers("/uploadFile")
+                .authenticated()
+
                 .anyRequest().permitAll()
+
                 .and()
                 .formLogin();
+
 //        http.authorizeRequests().anyRequest()
 //                .authenticated()
 //                .and()

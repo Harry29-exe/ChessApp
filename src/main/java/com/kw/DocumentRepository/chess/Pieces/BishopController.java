@@ -1,40 +1,26 @@
 package com.kw.DocumentRepository.chess.Pieces;
 
-import com.kw.DocumentRepository.chess.JSONBoard;
+import com.kw.DocumentRepository.chess.Board;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.kw.DocumentRepository.chess.Pieces.Piece.*;
 
-public class Bishop implements PieceController {
-    private JSONBoard board;
-    private Piece piece;
-    private List<JSONBoard> boards;
-    private int x;
-    private int y;
-    private boolean isWhite;
+public class BishopController extends AbstractPieceController {
 
     @Override
-    public List<JSONBoard> getPossibleBoardStates(int x, int y, JSONBoard board) {
-        this.board = board;
-        this.piece = Piece.getPieceTypeByCode(board.getPieceAt(x, y));
-        this.boards = new LinkedList<>();
-        this.x = x;
-        this.y = y;
-        this.isWhite = Piece.isPieceWhite(piece);
+    public List<Board> getPossibleBoardStates(int x, int y, Board board) {
+        this.init(x,y,board);
 
         iterate(-1,-1);
         iterate(-1,1);
         iterate(1,1);
         iterate(1,-1);
 
-        this.board = null;
-        this.piece = null;
+        List<Board> returnVal = possibleBoards;
+        this.cleanup();
 
-        List<JSONBoard> temp = boards;
-        boards = null;
-        return temp;
+        return returnVal;
     }
 
     private void iterate(int xChange, int yChange) {
@@ -43,25 +29,21 @@ public class Bishop implements PieceController {
         while( indexIsCorrect(xToCheck) && indexIsCorrect(yToCheck) ) {
             int piece = board.getPieceAt(xToCheck, yToCheck);
             if(piece == NULL.code) {
-                JSONBoard b = board.clone();
+                Board b = board.clone();
                 b.setPieceAt(x, y, NULL.code);
                 b.setPieceAt(xToCheck, yToCheck, isWhite? WHITE_BISHOP.code : BLACK_BISHOP.code);
-                boards.add(b);
+                possibleBoards.add(b);
                 xToCheck += xChange;
                 yToCheck += yChange;
             } else if (isWhite != isPieceWhite(piece)) {
-                JSONBoard b = board.clone();
+                Board b = board.clone();
                 b.setPieceAt(x,y, NULL.code);
                 b.setPieceAt(xToCheck, yToCheck, isWhite? WHITE_BISHOP.code : BLACK_BISHOP.code);
-                boards.add(b);
+                possibleBoards.add(b);
                 return;
             } else {
                 return;
             }
         }
-    }
-
-    private boolean indexIsCorrect(int i) {
-        return i < 8 && i >= 0;
     }
 }

@@ -99,7 +99,7 @@ export class ChessService {
             }
         }
 
-        moveRequest.open("POST", "http://localhost:8080/api/chess/make-move", true);
+        moveRequest.open("POST", "http://192.168.0.104:8080/api/chess/make-move", true);
         moveRequest.setRequestHeader("Content-Type", "application/json; charset=utf-8");
         moveRequest.send(jsonBoard);
 

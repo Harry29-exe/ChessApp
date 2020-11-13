@@ -19,7 +19,6 @@ public class Chess {
         headers.add("Content-Type", "text/html");
         File chessFile = new File("src\\main\\resources\\static\\chess.html");
 
-
         return ResponseEntity.ok().headers(headers).body(fileToString(chessFile));
     }
 

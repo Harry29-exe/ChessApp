@@ -1,9 +1,9 @@
 package com.kw.DocumentRepository.chess.ai;
 
-import com.kw.DocumentRepository.chess.JSONBoard;
+import com.kw.DocumentRepository.chess.Board;
 
 public interface ChessAI {
 
-    JSONBoard getBestMove(JSONBoard board);
+    Board getBestMove(Board board);
 
 }

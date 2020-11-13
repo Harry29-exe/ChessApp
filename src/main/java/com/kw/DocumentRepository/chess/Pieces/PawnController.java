@@ -1,38 +1,23 @@
 package com.kw.DocumentRepository.chess.Pieces;
 
-import com.kw.DocumentRepository.chess.JSONBoard;
+import com.kw.DocumentRepository.chess.Board;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.kw.DocumentRepository.chess.Pieces.Piece.*;
 
-public class Pawn implements PieceController {
-    private JSONBoard board;
-    private Piece piece;
-    private List<JSONBoard> boards;
-    private int x;
-    private int y;
-    private boolean isWhite;
+public class PawnController extends AbstractPieceController {
 
     @Override
-    public List<JSONBoard> getPossibleBoardStates(int x, int y, JSONBoard board) {
-        this.board = board;
-        this.piece = Piece.getPieceTypeByCode(board.getPieceAt(x, y));
-        this.boards = new LinkedList<>();
-        this.x = x;
-        this.y = y;
-        this.isWhite = Piece.isPieceWhite(piece);
+    public List<Board> getPossibleBoardStates(int x, int y, Board board) {
+        init(x,y,board);
 
         checkMoveForward();
         checkBeatings();
 
-        this.board = null;
-        this.piece = null;
-
-        List<JSONBoard> temp = boards;
-        boards = null;
-        return temp;
+        List<Board> returnVal = possibleBoards;
+        cleanup();
+        return returnVal;
     }
 
     private void checkMoveForward() {
@@ -41,21 +26,21 @@ public class Pawn implements PieceController {
         int yEnd = isWhite ? 1 : 6;
 
         if(y == yStart && board.getPieceAt(x,y + yVar) == NULL.code && board.getPieceAt(x,y + 2*yVar) == NULL.code) {
-            JSONBoard b1 = board.clone();
+            Board b1 = board.clone();
             b1.setPieceAt(x,y, NULL.code);
             b1.setPieceAt(x,y+yVar, piece.code);
-            boards.add(b1);
-            JSONBoard b2 = board.clone();
+            possibleBoards.add(b1);
+            Board b2 = board.clone();
             b2.setPieceAt(x,y, NULL.code);
             b2.setPieceAt(x,y+2*yVar, piece.code);
-            boards.add(b2);
+            possibleBoards.add(b2);
         } else if(y == yEnd && board.getPieceAt(x,y + yVar) == NULL.code) {
             promoteMove(x, y+yVar);
         } else if(board.getPieceAt(x,y + yVar) == NULL.code) {
-            JSONBoard b = board.clone();
+            Board b = board.clone();
             b.setPieceAt(x,y, NULL.code);
             b.setPieceAt(x,y+yVar, piece.code);
-            boards.add(b);
+            possibleBoards.add(b);
         }
     }
 
@@ -71,10 +56,10 @@ public class Pawn implements PieceController {
                 if (y == yEnd) {
                     promoteMove(x + 1, y + yVar);
                 } else {
-                    JSONBoard b = board.clone();
+                    Board b = board.clone();
                     b.setPieceAt(x, y, NULL.code);
                     b.setPieceAt(x + 1, y + yVar, isWhite ? WHITE_PAWN.code : BLACK_PAWN.code);
-                    boards.add(b);
+                    possibleBoards.add(b);
                 }
             }
         }
@@ -86,10 +71,10 @@ public class Pawn implements PieceController {
                 if (y == yEnd) {
                     promoteMove(x - 1, y + yVar);
                 } else {
-                    JSONBoard b = board.clone();
+                    Board b = board.clone();
                     b.setPieceAt(x, y, NULL.code);
                     b.setPieceAt(x - 1, y + yVar, isWhite ? WHITE_PAWN.code : BLACK_PAWN.code);
-                    boards.add(b);
+                    possibleBoards.add(b);
                 }
             }
         }
@@ -98,17 +83,17 @@ public class Pawn implements PieceController {
     private void promoteMove(int onX, int onY) {
         if(isWhite) {
             for(int p = WHITE_ROOK.code; p < WHITE_KING.code; p++) {
-                JSONBoard b = board.clone();
+                Board b = board.clone();
                 b.setPieceAt(x,y, NULL.code);
                 b.setPieceAt(onX, onY, p);
-                boards.add(b);
+                possibleBoards.add(b);
             }
         } else {
             for(int p = BLACK_ROOK.code; p > BLACK_KING.code; p--) {
-                JSONBoard b = board.clone();
+                Board b = board.clone();
                 b.setPieceAt(x,y, NULL.code);
                 b.setPieceAt(onX, onY, p);
-                boards.add(b);
+                possibleBoards.add(b);
             }
         }
     }
